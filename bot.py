@@ -35,7 +35,11 @@ async def owner_commands(event):
 
 
 async def main():
+
+    create_tables()
+
     await client.start()
+
     me = await client.get_me()
 
     print(f"Logged in as: {me.first_name}")
