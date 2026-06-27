@@ -1,51 +1,26 @@
-import json
-
-CHANNELS_FILE = "channels.json"
-
-
-def load_channels():
-    try:
-        with open(CHANNELS_FILE, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            return data["channels"]
-    except:
-        return []
+from telethon import functions
+from database import get_channels
 
 
-def save_channels(channels):
-    with open(CHANNELS_FILE, "w", encoding="utf-8") as f:
-        json.dump(
-            {
-                "channels": channels
-            },
-            f,
-            indent=4
-        )
+async def set_name_all(client, new_name):
 
+    channels = get_channels()
 
-def add_channel(username):
+    success = 0
 
-    channels = load_channels()
+    for username, title in channels:
 
-    if username not in channels:
-        channels.append(username)
-        save_channels(channels)
-        return True
+        try:
+            await client(
+                functions.channels.EditTitleRequest(
+                    channel=username,
+                    title=new_name
+                )
+            )
 
-    return False
+            success += 1
 
+        except Exception as e:
+            print(e)
 
-def remove_channel(username):
-
-    channels = load_channels()
-
-    if username in channels:
-        channels.remove(username)
-        save_channels(channels)
-        return True
-
-    return False
-
-
-def get_all_channels():
-    return load_channels()
+    return success
