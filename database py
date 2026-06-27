@@ -71,3 +71,43 @@ def get_channels():
     conn.close()
 
     return data
+def channel_exists(username):
+
+    conn = connect()
+    cur = conn.cursor()
+
+    cur.execute(
+        "SELECT id FROM channels WHERE username=?",
+        (username,)
+    )
+
+    data = cur.fetchone()
+
+    conn.close()
+
+    return data is not None
+
+
+def get_channel_count():
+
+    conn = connect()
+    cur = conn.cursor()
+
+    cur.execute("SELECT COUNT(*) FROM channels")
+
+    total = cur.fetchone()[0]
+
+    conn.close()
+
+    return total
+
+
+def clear_channels():
+
+    conn = connect()
+    cur = conn.cursor()
+
+    cur.execute("DELETE FROM channels")
+
+    conn.commit()
+    conn.close()
