@@ -1,4 +1,15 @@
 from telethon import functions
+
+from database import (
+    add_channel,
+    remove_channel,
+    get_channels,
+    channel_exists,
+    get_channel_count,
+    clear_channels
+)
+
+from telethon import functions
 from database import get_channels
 
 
