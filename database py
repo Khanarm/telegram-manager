@@ -1,0 +1,73 @@
+import sqlite3
+
+DB_NAME = "manager.db"
+
+
+def connect():
+    return sqlite3.connect(DB_NAME)
+
+
+def create_tables():
+    conn = connect()
+    cur = conn.cursor()
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS channels(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE,
+        title TEXT
+    )
+    """)
+
+    conn.commit()
+    conn.close()
+
+
+def add_channel(username, title=""):
+
+    conn = connect()
+    cur = conn.cursor()
+
+    try:
+        cur.execute(
+            "INSERT INTO channels(username,title) VALUES(?,?)",
+            (username, title)
+        )
+        conn.commit()
+        return True
+
+    except:
+        return False
+
+    finally:
+        conn.close()
+
+
+def remove_channel(username):
+
+    conn = connect()
+    cur = conn.cursor()
+
+    cur.execute(
+        "DELETE FROM channels WHERE username=?",
+        (username,)
+    )
+
+    conn.commit()
+    conn.close()
+
+
+def get_channels():
+
+    conn = connect()
+    cur = conn.cursor()
+
+    cur.execute(
+        "SELECT username,title FROM channels"
+    )
+
+    data = cur.fetchall()
+
+    conn.close()
+
+    return data
