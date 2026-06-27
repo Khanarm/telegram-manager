@@ -8,6 +8,8 @@ from config import (
     OWNER_ID
 )
 
+from database import create_tables
+
 client = TelegramClient(
     StringSession(SESSION_STRING),
     API_ID,
