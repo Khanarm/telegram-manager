@@ -9,6 +9,7 @@ from config import (
 )
 
 from database import create_tables
+from commands import set_name_all
 
 client = TelegramClient(
     StringSession(SESSION_STRING),
