@@ -1,3 +1,5 @@
+import os
+import asyncio
 from telethon import TelegramClient, events
 from telethon.sessions import StringSession
 
@@ -6,9 +8,8 @@ import commands as cmd
 
 
 # ==========================
-# CLIENT START
+# CLIENT
 # ==========================
-
 client = TelegramClient(
     StringSession(STRING_SESSION),
     API_ID,
@@ -17,7 +18,7 @@ client = TelegramClient(
 
 
 # ==========================
-# START MESSAGE
+# HANDLERS
 # ==========================
 
 @client.on(events.NewMessage(pattern=r"^/start$"))
@@ -26,10 +27,6 @@ async def start(event):
         return
     await event.reply("✅ Userbot is running successfully!")
 
-
-# ==========================
-# CHANNEL COMMANDS
-# ==========================
 
 @client.on(events.NewMessage(pattern=r"^/addchannel"))
 async def addchannel(event):
@@ -51,10 +48,6 @@ async def clearchannels(event):
     await cmd.cmd_clear(event)
 
 
-# ==========================
-# NAME COMMANDS
-# ==========================
-
 @client.on(events.NewMessage(pattern=r"^/setname"))
 async def setname(event):
     await cmd.set_name_all(client, event)
@@ -64,10 +57,6 @@ async def setname(event):
 async def rename(event):
     await cmd.rename_one(client, event)
 
-
-# ==========================
-# USERNAME COMMANDS
-# ==========================
 
 @client.on(events.NewMessage(pattern=r"^/setusername"))
 async def setusername(event):
@@ -79,10 +68,6 @@ async def username(event):
     await cmd.username_one(client, event)
 
 
-# ==========================
-# ABOUT COMMANDS
-# ==========================
-
 @client.on(events.NewMessage(pattern=r"^/setabout"))
 async def setabout(event):
     await cmd.set_about_all(client, event)
@@ -93,10 +78,6 @@ async def about(event):
     await cmd.about_one(client, event)
 
 
-# ==========================
-# PHOTO COMMANDS
-# ==========================
-
 @client.on(events.NewMessage(pattern=r"^/setphoto"))
 async def setphoto(event):
     await cmd.set_photo_all(client, event)
@@ -104,12 +85,8 @@ async def setphoto(event):
 
 @client.on(events.NewMessage(pattern=r"^/photo"))
 async def photo(event):
-    await cmd.photo_one(client, event)
+    await cmd.photo_one(event)
 
-
-# ==========================
-# BROADCAST COMMANDS
-# ==========================
 
 @client.on(events.NewMessage(pattern=r"^/broadcastall"))
 async def broadcastall(event):
@@ -122,12 +99,15 @@ async def broadcast(event):
 
 
 # ==========================
-# MAIN START
+# MAIN LOOP (IMPORTANT FIX)
 # ==========================
+async def main():
+    print("🚀 Bot is starting...")
 
-print("🚀 Bot is starting...")
+    await client.start()
+    print("✅ Bot is running!")
 
-client.start()
-print("✅ Bot is running!")
+    await client.run_until_disconnected()
 
-client.run_until_disconnected()
+
+asyncio.run(main())
