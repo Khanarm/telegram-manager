@@ -1,2 +1,6 @@
 telethon==1.34.0
 pytz
+flask
+rsa
+pyasn1
+pyaes
