@@ -1,37 +1,62 @@
 from telethon import functions
-
 from database import (
     add_channel,
     remove_channel,
     get_channels,
     channel_exists,
-    get_channel_count,
-    clear_channels
 )
 
-from telethon import functions
-from database import get_channels
+# ==========================
+# Add Channel
+# ==========================
+
+async def cmd_add(event):
+    try:
+        channel = event.raw_text.split(maxsplit=1)[1].strip()
+
+        if channel_exists(channel):
+            await event.reply("⚠️ Channel already added.")
+            return
+
+        add_channel(channel)
+
+        await event.reply(f"✅ Added: {channel}")
+
+    except:
+        await event.reply("Usage:\n/addchannel @channel")
 
 
-async def set_name_all(client, new_name):
+# ==========================
+# Remove Channel
+# ==========================
+
+async def cmd_remove(event):
+    try:
+        channel = event.raw_text.split(maxsplit=1)[1].strip()
+
+        remove_channel(channel)
+
+        await event.reply(f"🗑 Removed: {channel}")
+
+    except:
+        await event.reply("Usage:\n/removechannel @channel")
+
+
+# ==========================
+# List Channels
+# ==========================
+
+async def cmd_list(event):
 
     channels = get_channels()
 
-    success = 0
+    if not channels:
+        await event.reply("No channels added.")
+        return
 
-    for username, title in channels:
+    msg = "📋 Channel List\n\n"
 
-        try:
-            await client(
-                functions.channels.EditTitleRequest(
-                    channel=username,
-                    title=new_name
-                )
-            )
+    for ch in channels:
+        msg += f"• {ch}\n"
 
-            success += 1
-
-        except Exception as e:
-            print(e)
-
-    return success
+    await event.reply(msg)
