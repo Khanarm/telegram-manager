@@ -1,23 +1,17 @@
-# ==========================
-# TELETHON USERBOT CONFIG
-# ==========================
+import os
 
-# Telegram API (my.telegram.org se milega)
-API_ID = 1234567
-API_HASH = "your_api_hash_here"
+# Telegram API
+API_ID = int(os.getenv("API_ID"))
+API_HASH = os.getenv("API_HASH")
 
-# Session string (string session generator se lena hoga)
-STRING_SESSION = "your_string_session_here"
+# Session string
+STRING_SESSION = os.getenv("STRING_SESSION")
 
-# Owner ID (sirf tumhara Telegram user ID)
-OWNER_ID = 123456789
+# Owner ID
+OWNER_ID = int(os.getenv("OWNER_ID"))
 
-# ==========================
-# OPTIONAL SETTINGS
-# ==========================
-
+# Optional
 BOT_NAME = "Channel Manager Userbot"
 VERSION = "1.0"
 
-# Database file
 DB_NAME = "channels.db"
