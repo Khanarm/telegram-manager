@@ -1,3 +1,7 @@
+import asyncio
+
+asyncio.set_event_loop(asyncio.new_event_loop())
+
 import os
 import asyncio
 from telethon import TelegramClient, events
