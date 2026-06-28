@@ -1,56 +1,47 @@
 import sqlite3
 
-DB_NAME = "manager.db"
-
-
-def connect():
-    return sqlite3.connect(DB_NAME)
+DB_NAME = "channels.db"
 
 
 def create_tables():
-    conn = connect()
+    conn = sqlite3.connect(DB_NAME)
     cur = conn.cursor()
 
     cur.execute("""
-    CREATE TABLE IF NOT EXISTS channels(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE,
-        title TEXT
-    )
+        CREATE TABLE IF NOT EXISTS channels (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            channel TEXT UNIQUE NOT NULL
+        )
     """)
 
     conn.commit()
     conn.close()
 
 
-def add_channel(username, title=""):
-
-    conn = connect()
+def add_channel(channel):
+    conn = sqlite3.connect(DB_NAME)
     cur = conn.cursor()
 
     try:
         cur.execute(
-            "INSERT INTO channels(username,title) VALUES(?,?)",
-            (username, title)
+            "INSERT INTO channels (channel) VALUES (?)",
+            (channel,)
         )
         conn.commit()
         return True
-
-    except:
+    except sqlite3.IntegrityError:
         return False
-
     finally:
         conn.close()
 
 
-def remove_channel(username):
-
-    conn = connect()
+def remove_channel(channel):
+    conn = sqlite3.connect(DB_NAME)
     cur = conn.cursor()
 
     cur.execute(
-        "DELETE FROM channels WHERE username=?",
-        (username,)
+        "DELETE FROM channels WHERE channel=?",
+        (channel,)
     )
 
     conn.commit()
@@ -58,54 +49,40 @@ def remove_channel(username):
 
 
 def get_channels():
-
-    conn = connect()
+    conn = sqlite3.connect(DB_NAME)
     cur = conn.cursor()
 
-    cur.execute(
-        "SELECT username,title FROM channels"
-    )
+    cur.execute("SELECT channel FROM channels")
 
-    data = cur.fetchall()
+    rows = cur.fetchall()
 
     conn.close()
 
-    return data
+    return [row[0] for row in rows]
 
-def channel_exists(username):
 
-    conn = connect()
+def channel_exists(channel):
+    conn = sqlite3.connect(DB_NAME)
     cur = conn.cursor()
 
     cur.execute(
-        "SELECT id FROM channels WHERE username=?",
-        (username,)
+        "SELECT 1 FROM channels WHERE channel=?",
+        (channel,)
     )
 
-    data = cur.fetchone()
+    result = cur.fetchone()
 
     conn.close()
 
-    return data is not None
+    return result is not None
 
 
 def get_channel_count():
-
-    conn = connect()
-    cur = conn.cursor()
-
-    cur.execute("SELECT COUNT(*) FROM channels")
-
-    total = cur.fetchone()[0]
-
-    conn.close()
-
-    return total
+    return len(get_channels())
 
 
 def clear_channels():
-
-    conn = connect()
+    conn = sqlite3.connect(DB_NAME)
     cur = conn.cursor()
 
     cur.execute("DELETE FROM channels")
