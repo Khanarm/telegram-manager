@@ -1,53 +1,133 @@
 from telethon import TelegramClient, events
 from telethon.sessions import StringSession
 
-from config import (
-    API_ID,
-    API_HASH,
-    SESSION_STRING,
-    OWNER_ID
-)
+from config import API_ID, API_HASH, STRING_SESSION
+import commands as cmd
 
-from database import create_tables
-from commands import set_name_all
+
+# ==========================
+# CLIENT START
+# ==========================
 
 client = TelegramClient(
-    StringSession(SESSION_STRING),
+    StringSession(STRING_SESSION),
     API_ID,
     API_HASH
 )
 
-print("===================================")
-print(" Telegram Channel Manager Started ")
-print("===================================")
 
+# ==========================
+# START MESSAGE
+# ==========================
 
-@client.on(events.NewMessage(outgoing=True))
-async def owner_commands(event):
-
-    # Sirf owner ke commands
-    if event.sender_id != OWNER_ID:
+@client.on(events.NewMessage(pattern=r"^/start$"))
+async def start(event):
+    if event.sender_id != cmd.OWNER_ID:
         return
-
-    text = event.raw_text
-
-    if text == "/ping":
-        await event.reply("✅ Bot Online")
+    await event.reply("✅ Userbot is running successfully!")
 
 
-async def main():
+# ==========================
+# CHANNEL COMMANDS
+# ==========================
 
-    create_tables()
-
-    await client.start()
-
-    me = await client.get_me()
-
-    print(f"Logged in as: {me.first_name}")
-    print(f"User ID: {me.id}")
-
-    await client.run_until_disconnected()
+@client.on(events.NewMessage(pattern=r"^/addchannel"))
+async def addchannel(event):
+    await cmd.cmd_add(event)
 
 
-if __name__ == "__main__":
-    client.loop.run_until_complete(main())
+@client.on(events.NewMessage(pattern=r"^/removechannel"))
+async def removechannel(event):
+    await cmd.cmd_remove(event)
+
+
+@client.on(events.NewMessage(pattern=r"^/listchannels"))
+async def listchannels(event):
+    await cmd.cmd_list(event)
+
+
+@client.on(events.NewMessage(pattern=r"^/clearchannels"))
+async def clearchannels(event):
+    await cmd.cmd_clear(event)
+
+
+# ==========================
+# NAME COMMANDS
+# ==========================
+
+@client.on(events.NewMessage(pattern=r"^/setname"))
+async def setname(event):
+    await cmd.set_name_all(client, event)
+
+
+@client.on(events.NewMessage(pattern=r"^/rename"))
+async def rename(event):
+    await cmd.rename_one(client, event)
+
+
+# ==========================
+# USERNAME COMMANDS
+# ==========================
+
+@client.on(events.NewMessage(pattern=r"^/setusername"))
+async def setusername(event):
+    await cmd.set_username_all(client, event)
+
+
+@client.on(events.NewMessage(pattern=r"^/username"))
+async def username(event):
+    await cmd.username_one(client, event)
+
+
+# ==========================
+# ABOUT COMMANDS
+# ==========================
+
+@client.on(events.NewMessage(pattern=r"^/setabout"))
+async def setabout(event):
+    await cmd.set_about_all(client, event)
+
+
+@client.on(events.NewMessage(pattern=r"^/about"))
+async def about(event):
+    await cmd.about_one(client, event)
+
+
+# ==========================
+# PHOTO COMMANDS
+# ==========================
+
+@client.on(events.NewMessage(pattern=r"^/setphoto"))
+async def setphoto(event):
+    await cmd.set_photo_all(client, event)
+
+
+@client.on(events.NewMessage(pattern=r"^/photo"))
+async def photo(event):
+    await cmd.photo_one(client, event)
+
+
+# ==========================
+# BROADCAST COMMANDS
+# ==========================
+
+@client.on(events.NewMessage(pattern=r"^/broadcastall"))
+async def broadcastall(event):
+    await cmd.broadcast_all(client, event)
+
+
+@client.on(events.NewMessage(pattern=r"^/broadcast"))
+async def broadcast(event):
+    await cmd.broadcast_one(client, event)
+
+
+# ==========================
+# MAIN START
+# ==========================
+
+print("🚀 Bot is starting...")
+
+client.start()
+print("✅ Bot is running!")
+
+client.run_until_disconnected()
