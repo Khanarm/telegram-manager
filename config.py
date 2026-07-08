@@ -14,4 +14,4 @@ OWNER_ID = int(os.getenv("OWNER_ID"))
 BOT_NAME = "Channel Manager Userbot"
 VERSION = "1.0"
 
-DB_NAME = "channels.db"
+MONGO_URI = os.getenv("MONGO_URI")
