@@ -1,105 +1,39 @@
-import sqlite3
+from pymongo import MongoClient
+import os
 
-DB_NAME = "channels.db"
+MONGO_URI = os.getenv("MONGO_URI")
 
-conn = sqlite3.connect(DB_NAME, check_same_thread=False)
-cursor = conn.cursor()
+client = MongoClient(MONGO_URI)
+db = client["telegram_manager"]
+channels = db["channels"]
 
-# ==========================
-# CREATE TABLE
-# ==========================
-
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS channels (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT UNIQUE
-)
-""")
-
-conn.commit()
-
-
-# ==========================
-# ADD CHANNEL
-# ==========================
 
 def add_channel(username):
-    try:
-        cursor.execute(
-            "INSERT INTO channels (username) VALUES (?)",
-            (username,)
-        )
-        conn.commit()
-        return True
-    except sqlite3.IntegrityError:
+    if channels.find_one({"username": username}):
         return False
+    channels.insert_one({"username": username})
+    return True
 
-
-# ==========================
-# REMOVE CHANNEL
-# ==========================
 
 def remove_channel(username):
-    cursor.execute(
-        "DELETE FROM channels WHERE username=?",
-        (username,)
-    )
-    conn.commit()
+    channels.delete_one({"username": username})
 
-
-# ==========================
-# GET ALL CHANNELS
-# ==========================
 
 def get_channels():
-    cursor.execute(
-        "SELECT username FROM channels"
-    )
+    return [doc["username"] for doc in channels.find({}, {"_id": 0, "username": 1})]
 
-    rows = cursor.fetchall()
-
-    return [row[0] for row in rows]
-
-
-# ==========================
-# CHECK CHANNEL EXISTS
-# ==========================
 
 def channel_exists(username):
-    cursor.execute(
-        "SELECT 1 FROM channels WHERE username=?",
-        (username,)
-    )
+    return channels.find_one({"username": username}) is not None
 
-    return cursor.fetchone() is not None
-
-
-# ==========================
-# CLEAR ALL CHANNELS
-# ==========================
 
 def clear_channels():
-    cursor.execute(
-        "DELETE FROM channels"
-    )
-    conn.commit()
+    channels.delete_many({})
 
-
-# ==========================
-# TOTAL CHANNELS
-# ==========================
 
 def get_channel_count():
-    cursor.execute(
-        "SELECT COUNT(*) FROM channels"
-    )
+    return channels.count_documents({})
 
-    return cursor.fetchone()[0]
-
-
-# ==========================
-# CLOSE DATABASE
-# ==========================
 
 def close_database():
-    conn.close()
+    client.close()
